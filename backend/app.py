@@ -66,6 +66,16 @@ def get_dynamic_deployment():
             "need": int(target_spot['update_need'])
         }
     })
+@app.route('/api/orchestration/pulse_sync', methods=['GET'])
+def pulse_sync():
+    # logic to compare current district list with a standard Gazette API/JSON
+    # identify "Stale" records where district name has changed
+    affected_count = engine.df_enrol[engine.df_enrol['district_is_stale'] == True].shape[0]
+    return jsonify({
+        "status": "Active",
+        "updates_pending": affected_count,
+        "action": "Trigger bulk address correction"
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
